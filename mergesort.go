@@ -1,30 +1,12 @@
 package main
 
 import (
+	"./fileio.go"
 	"fmt"
-	"time"
-
-	"bufio"
-	"log"
-	"os"
-
-	//"sort"
+	"sort"
 	"strconv"
+	"time"
 )
-
-func readLines(path string) ([]string, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-	var lines []string
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	return lines, scanner.Err()
-}
 
 func merge_sort(l []int) []int {
 	if len(l) <= 1 {
@@ -33,7 +15,6 @@ func merge_sort(l []int) []int {
 	mid := len(l) / 2
 	left := merge_sort(l[:mid])
 	right := merge_sort(l[mid:])
-	//fmt.Println(left, right)
 	return merge(left, right)
 }
 
@@ -56,25 +37,25 @@ func merge(left, right []int) []int {
 	for ; j < len(right); j, ind = j+1, ind+1 {
 		result[ind] = right[j]
 	}
-	//fmt.Println(result)
 	return result
 }
 
 func main() {
-	l := make([]int, 1000000)
+	l := make([]int, 10000000)
 
 	lines, err := readLines("arr.txt")
-	if err != nil {
-		log.Fatalf("readLines: %s", err)
-	}
 	for i, line := range lines {
-		l[i], _ = strconv.Atoi(line)
+		if i <= len(l) {
+			l[i], err = strconv.Atoi(line)
+		}
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	start := time.Now()
-	//sort.Ints(l)
-	l = merge_sort(l)
+	sort.Ints(l)
+	//l = merge_sort(l)
 	end := time.Since(start)
 	fmt.Println(end)
-	//fmt.Println(l)
 }
