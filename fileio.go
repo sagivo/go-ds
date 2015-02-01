@@ -35,6 +35,7 @@ func writeLines(lines []string, path string) error {
 	for _, line := range lines {
 		fmt.Fprintln(w, line)
 	}
+
 	return w.Flush()
 }
 
