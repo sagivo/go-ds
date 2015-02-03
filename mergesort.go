@@ -1,21 +1,36 @@
 package main
 
 import (
-	"./fileio.go"
+	"bufio"
 	"fmt"
-	"sort"
-	"strconv"
+	"os"
 	"time"
+	//"sort"
+	"strconv"
 )
 
-func merge_sort(l []int) []int {
-	if len(l) <= 1 {
-		return l
+func readLines(path string) ([]string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines, scanner.Err()
+}
+
+func merge_sort(l []int, c chan []int) {
+	if len(l) < 2 {
+		c <- l
 	}
 	mid := len(l) / 2
-	left := merge_sort(l[:mid])
-	right := merge_sort(l[mid:])
-	return merge(left, right)
+	go merge_sort(l[:mid], c)
+	go merge_sort(l[mid:], c)
+	c <- merge(<-c, <-c)
 }
 
 func merge(left, right []int) []int {
@@ -54,8 +69,10 @@ func main() {
 	}
 
 	start := time.Now()
-	sort.Ints(l)
-	//l = merge_sort(l)
+	//sort.Ints(l)
+	c := make(chan []int)
+	merge_sort(l, c)
+	l = <-c
 	end := time.Since(start)
 	fmt.Println(end)
 }
